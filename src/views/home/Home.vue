@@ -6,28 +6,25 @@
       </template>
     </NavBar>
 
-    <Swiper>
-      <swiper-item v-for="item in banners">
-        <a :href="item.link">
-          <img :src="item.image923" alt="">
-        </a>
-      </swiper-item>
-    </Swiper>
+    <home-swiper :cbanners="banners"></home-swiper>
+
+    <HomeRecommendView :recommends="recommends"></HomeRecommendView>
   </div>
 </template>
 
 <script>
   import NavBar from "components/common/navbar/NavBar";
+  import HomeSwiper from "views/home/childComps/HomeSwiper";
+  import HomeRecommendView from "views/home/childComps/HomeRecommendView";
+
   import {getHomeMultidata} from "network/home";
-  import Swiper from "../../components/common/swiper/Swiper";
-  import SwiperItem from "../../components/common/swiper/SwiperItem";
 
   export default {
     name: "Home",
     components: {
-      Swiper,
-      SwiperItem,
       NavBar,
+      HomeSwiper,
+      HomeRecommendView,
     },
     data() {
       return {
