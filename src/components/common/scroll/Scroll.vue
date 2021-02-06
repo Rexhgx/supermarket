@@ -7,7 +7,9 @@
 </template>
 
 <script>
-  import BScroll from 'better-scroll'
+  import BScroll from "@better-scroll/core";
+  import PullUp from '@better-scroll/pull-up';
+  BScroll.use(PullUp);
 
   export default {
     name: "Scroll",
@@ -15,6 +17,10 @@
       probeType: {
         type: Number,
         default: 0
+      },
+      pullUpLoad: {
+        type: Boolean,
+        default: true,
       }
     },
     data() {
@@ -24,16 +30,26 @@
     },
     mounted() {
       this.scroll = new BScroll(this.$refs.wrapper, {
+        click: true,
         probeType: this.probeType,
+        pullUpLoad: this.pullUpLoad,
       })
 
       this.scroll.on('scroll', (position) => {
         this.$emit('scroll', position)
       })
+
+      this.scroll.on('pullingUp', () => {
+        this.$emit('pullingUp')
+      })
     },
     methods: {
       scrollTo(x, y, time=500) {
         this.scroll.scrollTo(x, y, time)
+      },
+
+      finishPullUp() {
+        this.scroll.finishPullUp()
       }
     }
   }

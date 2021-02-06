@@ -6,7 +6,14 @@
       </template>
     </NavBar>
 
-    <Scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll">
+    <Scroll
+      class="content"
+      ref="scroll"
+      :probe-type="3"
+      @scroll="contentScroll"
+      :pull-up-load="true"
+      @pullingUp="loadMore"
+    >
         <home-swiper :cbanners="banners"></home-swiper>
 
         <HomeRecommendView :recommends="recommends"></HomeRecommendView>
@@ -106,6 +113,11 @@
       contentScroll(position) {
         this.isShowBackTop = (-position.y) > 1000
       },
+      loadMore() {
+        this.getHomeGoods(this.currentType)
+
+
+      },
 
       /**
        * 网络请求相关的方法
@@ -122,6 +134,7 @@
         getHomeGoods(type, page).then(res => {
           this.goods[type].page += 1
           this.goods[type].list.push(...res.data.list)
+          this.$refs.scroll.finishPullUp()
         })
       }
     }
