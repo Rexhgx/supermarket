@@ -6,6 +6,15 @@
       </template>
     </NavBar>
 
+    <tab-control
+      :titles="['流行','新款','精选']"
+      @tabClick="tabClick"
+      ref="tabControl1"
+      class="tab-control"
+      v-show="isTabFixed"
+    >
+    </tab-control>
+
     <Scroll
       class="content"
       ref="scroll"
@@ -14,13 +23,18 @@
       :pull-up-load="true"
       @pullingUp="loadMore"
     >
-        <home-swiper :cbanners="banners"></home-swiper>
+        <home-swiper :cbanners="banners" @swiperImageLoad="swiperImageLoad"></home-swiper>
 
         <HomeRecommendView :recommends="recommends"></HomeRecommendView>
 
         <HomeFeatureView></HomeFeatureView>
 
-        <tab-control class="tab-control" :titles="['流行','新款','精选']" @tabClick="tabClick"></tab-control>
+        <tab-control
+          :titles="['流行','新款','精选']"
+          @tabClick="tabClick"
+          ref="tabControl2"
+        >
+        </tab-control>
 
         <goods-list :goods="showGoods">
 
@@ -77,8 +91,18 @@
           },
         },
         currentType: 'pop',
-        isShowBackTop: false
+        isShowBackTop: false,
+        tabOffsetTop: 0,
+        isTabFixed: false,
+        saveY: 0
       }
+    },
+    activated() {
+      console.log(this.saveY)
+      this.$refs.scroll.scrollTo(0, this.saveY, 0)
+    },
+    deactivated() {
+      this.saveY = this.$refs.scroll.getScrollY()
     },
     created() {
       this.getHomeMultidata()
@@ -114,15 +138,22 @@
             this.currentType = 'sell'
             break
         }
+        this.$refs.tabControl1.currentIndex = index
+        this.$refs.tabControl2.currentIndex = index
       },
       backClick() {
         this.$refs.scroll.scrollTo(0, 0, 1000)
       },
       contentScroll(position) {
         this.isShowBackTop = (-position.y) > 1000
+
+        this.isTabFixed = (-position.y) > this.tabOffsetTop
       },
       loadMore() {
         this.getHomeGoods(this.currentType)
+      },
+      swiperImageLoad() {
+        this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop
       },
 
       /**
@@ -140,7 +171,7 @@
         getHomeGoods(type, page).then(res => {
           this.goods[type].page += 1
           this.goods[type].list.push(...res.data.list)
-          
+
           this.$refs.scroll.finishPullUp()
         })
       }
@@ -158,6 +189,7 @@
   .home-nav{
     background-color: var(--color-tint);
     color: white;
+
     position: fixed;
     left: 0;
     right: 0;
@@ -166,9 +198,16 @@
   }
 
   .tab-control {
-    position: sticky;
-    top: 44px;
+    position: relative;
+    z-index: 9;
   }
+
+  /*.fixed {*/
+  /*  position: fixed;*/
+  /*  left: 0;*/
+  /*  right: 0;*/
+  /*  top: 44px;*/
+  /*}*/
 
   .content {
     /*height: calc(100% - 93px);*/
