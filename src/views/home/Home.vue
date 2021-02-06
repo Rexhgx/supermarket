@@ -85,6 +85,13 @@
       this.getHomeGoods('new')
       this.getHomeGoods('sell')
     },
+    mounted() {
+      const refresh = this.debounce(this.$refs.scroll.refresh, 500)
+
+      this.$bus.$on('itemImageLoad', () => {
+        refresh()
+      })
+    },
     computed: {
       showGoods() {
         return this.goods[this.currentType].list
@@ -94,6 +101,17 @@
       /**
        * 事件监听相关的方法
        */
+      debounce(func, delay) {
+        let timer = null
+
+        return function (...args) {
+          if (timer) clearTimeout(timer)
+
+          timer = setTimeout(() => {
+            func.apply(this, args)
+          }, delay)
+        }
+      },
       tabClick(index) {
         switch (index) {
           case 0:
@@ -108,15 +126,13 @@
         }
       },
       backClick() {
-        this.$refs.scroll.scrollTo(0, 0, 500)
+        this.$refs.scroll.scrollTo(0, 0, 1000)
       },
       contentScroll(position) {
         this.isShowBackTop = (-position.y) > 1000
       },
       loadMore() {
         this.getHomeGoods(this.currentType)
-
-
       },
 
       /**
