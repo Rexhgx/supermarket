@@ -6,18 +6,21 @@
       </template>
     </NavBar>
 
-    <home-swiper :cbanners="banners"></home-swiper>
+    <Scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll">
+        <home-swiper :cbanners="banners"></home-swiper>
 
-    <HomeRecommendView :recommends="recommends"></HomeRecommendView>
+        <HomeRecommendView :recommends="recommends"></HomeRecommendView>
 
-    <HomeFeatureView></HomeFeatureView>
+        <HomeFeatureView></HomeFeatureView>
 
-    <tab-control class="tab-control" :titles="['流行','新款','精选']" @tabClick="tabClick"></tab-control>
+        <tab-control class="tab-control" :titles="['流行','新款','精选']" @tabClick="tabClick"></tab-control>
 
-    <goods-list :goods="showGoods">
+        <goods-list :goods="showGoods">
 
-    </goods-list>
+        </goods-list>
+    </Scroll>
 
+    <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
   </div>
 </template>
 
@@ -25,6 +28,8 @@
   import NavBar from "components/common/navbar/NavBar";
   import TabControl from "components/content/tabcontrol/TabControl";
   import GoodsList from "components/content/goods/GoodsList";
+  import Scroll from "components/common/scroll/Scroll";
+  import BackTop from "components/content/backTop/BackTop";
 
   import HomeSwiper from "views/home/childComps/HomeSwiper";
   import HomeRecommendView from "views/home/childComps/HomeRecommendView";
@@ -38,6 +43,8 @@
       NavBar,
       TabControl,
       GoodsList,
+      Scroll,
+      BackTop,
 
       HomeSwiper,
       HomeRecommendView,
@@ -62,6 +69,7 @@
           },
         },
         currentType: 'pop',
+        isShowBackTop: false
       }
     },
     created() {
@@ -92,6 +100,12 @@
             break
         }
       },
+      backClick() {
+        this.$refs.scroll.scrollTo(0, 0, 500)
+      },
+      contentScroll(position) {
+        this.isShowBackTop = (-position.y) > 1000
+      },
 
       /**
        * 网络请求相关的方法
@@ -117,6 +131,8 @@
 <style scoped>
   #home {
     padding-top: 44px;
+    height: 100vh;
+    position: relative;
   }
 
   .home-nav{
@@ -132,5 +148,15 @@
   .tab-control {
     position: sticky;
     top: 44px;
+  }
+
+  .content {
+    /*height: calc(100% - 93px);*/
+    overflow: hidden;
+    position: absolute;
+    top: 44px;
+    bottom: 49px;
+    left: 0;
+    right: 0;
   }
 </style>
