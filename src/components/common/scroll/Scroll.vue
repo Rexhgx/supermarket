@@ -67,5 +67,7 @@
 </script>
 
 <style scoped>
-
+.content {
+  background-color: #fff;
+}
 </style>

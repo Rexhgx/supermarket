@@ -35,6 +35,7 @@
     methods: {
       titleClick(index) {
         this.currentIndex = index
+        this.$emit('titleClick', index);
       },
 
       backClick() {
@@ -58,6 +59,6 @@
   }
 
   .back img {
-    margin-top: 10px;
+    margin-top: 12px;
   }
 </style>

@@ -41,7 +41,7 @@
         </goods-list>
     </Scroll>
 
-    <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
+    <back-top @click.native="backTop" v-show="isShowBackTop"></back-top>
   </div>
 </template>
 
@@ -50,14 +50,13 @@
   import TabControl from "components/content/tabcontrol/TabControl";
   import GoodsList from "components/content/goods/GoodsList";
   import Scroll from "components/common/scroll/Scroll";
-  import BackTop from "components/content/backTop/BackTop";
 
   import HomeSwiper from "views/home/childComps/HomeSwiper";
   import HomeRecommendView from "views/home/childComps/HomeRecommendView";
   import HomeFeatureView from "views/home/childComps/HomeFeatureView";
 
   import {getHomeMultidata, getHomeGoods} from "network/home";
-  import {debounce} from "common/utils";
+  import {itemListenerMixin, backTopMixin} from "common/mixin";
 
   export default {
     name: "Home",
@@ -66,12 +65,12 @@
       TabControl,
       GoodsList,
       Scroll,
-      BackTop,
 
       HomeSwiper,
       HomeRecommendView,
       HomeFeatureView,
     },
+    mixins: [itemListenerMixin, backTopMixin],
     data() {
       return {
         banners: [],
@@ -91,10 +90,9 @@
           },
         },
         currentType: 'pop',
-        isShowBackTop: false,
         tabOffsetTop: 0,
         isTabFixed: false,
-        saveY: 0
+        saveY: 0,
       }
     },
     activated() {
@@ -102,6 +100,8 @@
     },
     deactivated() {
       this.saveY = this.$refs.scroll.getScrollY()
+
+      this.$bus.$off('itemImageLoad', this.itemImageListener)
     },
     created() {
       this.getHomeMultidata()
@@ -110,11 +110,6 @@
       this.getHomeGoods('sell')
     },
     mounted() {
-      const refresh = debounce(this.$refs.scroll.refresh, 500)
-
-      this.$bus.$on('itemImageLoad', () => {
-        refresh()
-      })
     },
     computed: {
       showGoods() {
@@ -140,11 +135,8 @@
         this.$refs.tabControl1.currentIndex = index
         this.$refs.tabControl2.currentIndex = index
       },
-      backClick() {
-        this.$refs.scroll.scrollTo(0, 0, 1000)
-      },
       contentScroll(position) {
-        this.isShowBackTop = (-position.y) > 1000
+        this.listenShowBackTop(position);
 
         this.isTabFixed = (-position.y) > this.tabOffsetTop
       },
