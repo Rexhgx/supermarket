@@ -58,7 +58,6 @@
 
     methods:{
       imgLoad(){
-        //console.log('加载DetailGoodsInfo');
         this.$emit('detailImageLoad');
       }
     } ,
@@ -70,7 +69,6 @@
         }
        }
 
-        console.log(this.MyTopImages);
     }
   }
 </script>

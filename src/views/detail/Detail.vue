@@ -14,7 +14,7 @@
       <goods-list :goods="recommends" ref="recommend"></goods-list>
     </Scroll>
 
-    <detail-bottom-bar @addCart="addToCart"></detail-bottom-bar>
+    <detail-bottom-bar @addToCart="addToCart"></detail-bottom-bar>
 
     <back-top @click.native="backTop" v-show="isShowBackTop"></back-top>
   </div>
@@ -36,6 +36,8 @@
   import {getDetail, getRecommend, Goods, Shop, GoodsParams} from "network/detail";
   import {debounce} from "common/utils";
   import {itemListenerMixin, backTopMixin} from "common/mixin";
+
+  import {mapActions} from 'vuex'
 
   export default {
     name: "Detail",
@@ -110,6 +112,7 @@
       this.$bus.$off('itemImgLoad', this.itemImageListener)
     },
     methods: {
+      ...mapActions(['addCart']),
       detailImageLoad() {
         this.newRefresh()
 
@@ -142,10 +145,16 @@
         product.image = this.topImages[0];
         product.title = this.goods.title;
         product.desc = this.goods.desc;
-        product.price = this.goods.realPrice;
+        product.price = this.goods.nowPrice;
         product.iid = this.iid;
 
-        this.$store.commit('addCart', payload)
+        // this.$store.dispatch('addCart', product).then(res => {
+        //
+        // })
+
+        this.addCart(product).then(res => {
+
+        })
       }
     }
   }
